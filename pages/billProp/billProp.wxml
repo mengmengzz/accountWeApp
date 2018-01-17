@@ -1,0 +1,49 @@
+<view class="page">
+    <form bindsubmit="formSubmit">
+        <view class="weui-cells weui-cells_after-title">
+            <view class="weui-cell weui-cell_input">
+                <view class="weui-cell__hd">
+                    <view class="weui-label">类别</view>
+                </view>
+                <view class="weui-cell__bd">
+                    <picker mode="selector" name="type" value="{{typeList[typeIndex]}}" range="{{typeList}}" range-key="name" bindchange="bindTypeChange">
+                        <view class="weui-input">{{typeList[typeIndex].name}}</view>
+                    </picker>
+                </view>
+            </view>
+            <view class="weui-cell weui-cell_input">
+                <view class="weui-cell__hd">
+                    <view class="weui-label">日期</view>
+                </view>
+                <view class="weui-cell__bd">
+                    <picker mode="date" name="date" value="{{date}}" start="2017-12-01" end="{{endDate}}" bindchange="bindDateChange">
+                        <view class="weui-input">{{date}}</view>
+                    </picker>
+                </view>
+            </view>
+            <view class="weui-cell weui-cell_input">
+                <view class="weui-cell__hd">
+                    <view class="weui-label">金额</view>
+                </view>
+                <view class="weui-cell__bd">
+                    <input type="digit" name="money" value="{{money}}" class="weui-input" placeholder="单位（元）"/>
+                </view>
+            </view>
+            <view class="weui-cell weui-cell_input">
+                <view class="weui-cell__hd">
+                    <view class="weui-label">明细</view>
+                </view>
+                <view class="weui-cell__bd">
+                    <input class="weui-input" name="detail" value="{{detail}}" placeholder="可以不填" />
+                </view>
+            </view>
+        </view>
+        <view class="weui-btn-area">
+            <button class="weui-btn" type="primary" formType="submit">确认</button>
+        </view>
+        <view wx:if="{{id.length>0}}" class="weui-btn-area">
+            <button class="weui-btn" type="warn" data-id="{{id}}" bindtap="delBill" >删除</button>
+        </view>
+    </form>
+</view>
+      

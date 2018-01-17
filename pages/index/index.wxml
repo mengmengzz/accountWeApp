@@ -1,0 +1,27 @@
+<!--index.wxml-->
+<view class="page">
+  <view class="page__hd">
+    <view class="add">
+      <button class="weui-btn" type="primary" size="mini" bindtap="add">新增</button>
+    </view>
+    <view class="statistics">
+      <button class="weui-btn" type="default" size="mini" bindtap="monthStatistics">消费统计</button>
+    </view>
+  </view>
+  <view class="page__bd">
+    <view wx:if="{{listAccount.length>0}}" class="weui-cells weui-cells_after-title">
+        <view wx:for="{{listAccount}}" wx:key="id">
+          <navigator url="../billProp/billProp?id={{item.id}}" open-type="navigate" class="weui-cell weui-cell_access" hover-class="weui-cell_active">
+              <view class="weui-cell__bd">
+                <text class="gray">[{{item.date}}]</text> {{item.type_nm}}
+              </view>
+              <view class="weui-cell__ft weui-cell__ft_in-access black">{{item.money}}元</view>
+          </navigator>
+        </view>
+    </view>
+    <view wx:else class="center gray">
+        没有记录
+    </view>
+  </view>
+  
+</view>

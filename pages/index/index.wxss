@@ -1,0 +1,16 @@
+/**index.wxss**/
+.add {
+    float: left;
+}
+.statistics {
+    float: right;
+}
+.gray {
+    color: gray
+}
+.black {
+    color: black;
+}
+.center {
+    text-align: center
+}

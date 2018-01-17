@@ -1,0 +1,13 @@
+{
+  "pages":[
+    "pages/index/index",
+    "pages/billProp/billProp",
+    "pages/monthStat/monthStat"
+  ],
+  "window":{
+    "backgroundTextStyle":"light",
+    "navigationBarBackgroundColor": "#fff",
+    "navigationBarTitleText": "每天记账",
+    "navigationBarTextStyle":"black"
+  }
+}
