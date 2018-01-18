@@ -1,9 +1,10 @@
 {
   "pages":[
-    "pages/yearStat/yearStat",
+    
     "pages/index/index",
     "pages/billProp/billProp",
-    "pages/monthStat/monthStat"
+    "pages/monthStat/monthStat",
+    "pages/yearStat/yearStat"
     
   ],
   "window":{
