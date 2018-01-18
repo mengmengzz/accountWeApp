@@ -1,0 +1,28 @@
+.border {
+    border:1px solid lightgray;
+    border-radius:4px;
+}
+
+.yearShow {
+    font-size: 14px;
+    padding: 3px;
+}
+
+.container {
+    display: flex;
+    flex-direction: row;
+}
+.canvas {
+    width: 120px;
+    height: 120px;
+}
+
+.page__bd {
+    padding-top: 5px;
+}
+
+.yearSelect {
+    text-align: center;
+    width: 100px;
+    margin:0 auto;
+}

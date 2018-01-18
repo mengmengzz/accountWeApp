@@ -1,0 +1,18 @@
+<view class="page">
+    <view class="page__hd">
+        <view class="yearSelect">
+            <picker mode="date" fields="year" value="{{year}}" start="2016" end="{{endYear}}" bindchange="bindDateChange">
+                <view class="border yearShow">{{yearShow+'▼'}}</view>
+            </picker>
+        </view>
+    </view>
+    <view class="page__bd">
+        <view class="center">共消费{{yearTotal}}元</view>
+        <view class="container" wx:for="{{array2}}" wx:key="{{index}}" >
+            <view wx:for="{{array2[index]}}" wx:for-index="num" wx:for-item="bill" wx:key="type_nm">
+                <canvas canvas-id="ringCanvas-{{index}}-{{num}}" class="canvas"></canvas>
+            </view>
+        </view>
+    </view>
+</view>
+          

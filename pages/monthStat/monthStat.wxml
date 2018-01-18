@@ -6,7 +6,7 @@
             </picker>
         </view>
         <view class="right">
-            <button class="weui-btn" type="default" size="mini">年度统计</button>
+            <button class="weui-btn" type="default" size="mini" bindtap="yearStat">年度统计</button>
         </view>
     </view>
     <view class="page__bd">

@@ -24,6 +24,12 @@ Page({
     })
   },
 
+  yearStat: function() {
+    wx.navigateTo({
+      url: '../yearStat/yearStat'
+    })
+  },
+
   onLoad: function (option) {
     if(option.monthStr) {
       this.drawChart(option.monthStr);

@@ -1,8 +1,10 @@
 {
   "pages":[
+    "pages/yearStat/yearStat",
     "pages/index/index",
     "pages/billProp/billProp",
     "pages/monthStat/monthStat"
+    
   ],
   "window":{
     "backgroundTextStyle":"light",
