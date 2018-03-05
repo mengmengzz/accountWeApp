@@ -5,7 +5,7 @@ const Util = require('../../utils/util.js');
 //获取应用实例
 const app = getApp()
 
-const pageSize = 13;
+const pageSize = 15;
 let count=0;
 
 Page({
