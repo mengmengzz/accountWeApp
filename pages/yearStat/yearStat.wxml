@@ -8,6 +8,7 @@
     </view>
     <view class="page__bd">
         <view class="center">共消费{{yearTotal}}元</view>
+        <canvas canvas-id="columnCanvas" class="canvasColumn"></canvas>
         <view class="container" wx:for="{{array2}}" wx:key="{{index}}" >
             <view wx:for="{{array2[index]}}" wx:for-index="num" wx:for-item="bill" wx:key="type_nm">
                 <canvas canvas-id="ringCanvas-{{index}}-{{num}}" class="canvas"></canvas>

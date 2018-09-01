@@ -6,6 +6,7 @@ const wxCharts = require('../../utils/wxcharts.js');
 //获取应用实例
 const app = getApp()
 const currentYear = Util.getFormatDate().substr(0,4);
+const monthCategories = ['1月', '2月', '3月', '4月','5月','6月','7月','8月','9月','10月','11月','12月'];
 
 Page({
   data: {
@@ -192,6 +193,49 @@ Page({
                             });
                         }
                     }
+
+                    //柱状图
+                    for(var i=0;i<12;i++) { //取整
+                        arrayColumnar[i]=Math.round(arrayColumnar[i]);	
+                    }
+                    var windowWidth = 320;
+                    try {
+                        var res = wx.getSystemInfoSync();
+                        windowWidth = res.windowWidth;
+                    } catch (e) {
+                        console.error('getSystemInfoSync failed!');
+                    }
+                    var columnChart = new wxCharts({
+                        canvasId: 'columnCanvas',
+                        type: 'column',
+                        animation: true,
+                        categories: monthCategories,
+                        series: [{
+                            name: '消费金额(元)',
+                            data: arrayColumnar,
+                            format: function (val, name) {
+                                return val;
+                            }
+                        }],
+                        yAxis: {
+                            disabled: true,
+                            format: function (val) {
+                                return val;
+                            },
+                            min: 0
+                        },
+                        xAxis: {
+                            disableGrid: false,
+                            type: 'calibration'
+                        },
+                        extra: {
+                            column: {
+                                width: 12
+                            }
+                        },
+                        width: windowWidth,
+                        height: 200,
+                    });
                 }
             },
             error: function(error) {
