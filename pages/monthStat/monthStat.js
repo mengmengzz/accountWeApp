@@ -142,7 +142,7 @@ Page({
         for(var n=0;n<array2[i].length;n++) {
           array2[i][n].percent = Math.round((array2[i][n].num/sum)*100);  
           new wxCharts({
-              animation: true,
+              animation: false,
               canvasId: 'ringCanvas-'+i+'-'+n,
               type: 'ring',
               extra: {
