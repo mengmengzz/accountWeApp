@@ -11,10 +11,10 @@
     </view>
     <view class="page__bd">
         <view class="center">共消费{{monthTotal}}元</view>
-        <view class="container" wx:for="{{array2}}" wx:key="{{index}}" >
-            <view wx:for="{{array2[index]}}" wx:for-index="num" wx:for-item="bill" wx:key="type_nm">
-                <!-- <view id="ringCanvas-{{index}}-{{num}}" class="canvas">{{bill.percent}}-{{bill.num}}</view> -->
-                <canvas canvas-id="ringCanvas-{{index}}-{{num}}" class="canvas"></canvas>
+        <view class="container2">
+            <view class="container" wx:for="{{array2}}" wx:key="{{index}}">
+                <ff-canvas wx:for="{{array2[index]}}" wx:for-index="num" wx:for-item="bill" wx:key="type_nm"
+                    id="id-{{index}}-{{num}}" canvas-id="ringCanvas-{{index}}-{{num}}" opts="{{ optsArray[index*3+num] }}"></ff-canvas>
             </view>
         </view>
     </view>

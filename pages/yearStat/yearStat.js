@@ -1,12 +1,30 @@
 const Bmob = require('../../utils/bmob.js');
 const Util = require('../../utils/util.js');
 const Common = require('../../utils/common.js');
-const wxCharts = require('../../utils/wxcharts.js');
 
 //获取应用实例
 const app = getApp()
 const currentYear = Util.getFormatDate().substr(0,4);
 const monthCategories = ['1月', '2月', '3月', '4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+let chart = null;
+let columnChart = null;
+
+//柱状图
+function initChart(canvas, width, height, F2) {
+    let data = [];
+    columnChart = new F2.Chart({
+      el: canvas,
+      width,
+      height
+    });
+  
+    columnChart.source(data);
+    columnChart.axis('num', false);
+    columnChart.tooltip(false);
+    columnChart.interval().position('month*num');
+    columnChart.render();
+    return columnChart;
+  }
 
 Page({
   data: {
@@ -14,7 +32,11 @@ Page({
     yearShow: currentYear+"年",
     endYear: currentYear,
     yearTotal: "",
-    array2: []
+    array2: [],
+    optsArray: [],
+    columnOpts: {
+        onInit: initChart
+    }
   },
 
   bindDateChange: function(e) {
@@ -40,7 +62,7 @@ Page({
     var array=[];
     var array2=[];
     var arrayColumnar=[];
-    for(var i=0;i<12;i++) {
+    for(let i=0;i<12;i++) {
         arrayColumnar[i]=0.0;
     }
     var sum=0.0;
@@ -76,7 +98,7 @@ Page({
                     sumData(count);
                 }else {
                     console.log(totalResult.length); 
-                    for (var i = 0; i < totalResult.length; i++) {
+                    for (let i = 0; i < totalResult.length; i++) {
                         var object = totalResult[i];
                         sum=sum+parseFloat(object.get("money"));
                         if(array.length==0) {
@@ -86,7 +108,7 @@ Page({
                             j++;
                         }else {
                             var flag=false;
-                            for(var m=0;m<array.length;m++) {
+                            for(let m=0;m<array.length;m++) {
                                 if(array[m].type_nm==object.get("type_nm")) {
                                     array[m].num=array[m].num+parseFloat(object.get("money"));
                                     flag=true;
@@ -116,7 +138,7 @@ Page({
                         return 0;
                     });
 
-                    for(var n=0;n<array.length;n++) {
+                    for(let n=0;n<array.length;n++) {
                         array[n].num = array[n].num.toFixed(1);
                         let moneyNum = array[n].num;
                         if(moneyNum.indexOf(".0")!=-1) {
@@ -126,7 +148,7 @@ Page({
                     }
 
                     //一维数组转二维数组（目的是使圆环图每行显示3个）
-                    for(var i=0;i<array.length;i++) {  
+                    for(let i=0;i<array.length;i++) {  
                         if(y<3) {
                             if(y==0) {
                                 array2[x]=[];
@@ -141,101 +163,105 @@ Page({
                         }
                     }
                     
-                    var tempSum=sum.toFixed(1);
+                    //环形图
+                    let optsArray = [];
+                    for(let i=0;i<array2.length;i++) {
+                        for(let n=0;n<array2[i].length;n++) {
+                        array2[i][n].percent = Math.round((array2[i][n].num/sum)*100);  
+                        let func = function(canvas, width, height, F2) {
+                            let persent = array2[i][n].percent;
+                            if(persent==0) { //此处的百分比0表示四舍五入后为0，实际上是有值的，为了让其能在环形图上显示，将其百分比设为1
+                            persent = 1;
+                            }
+                            const data = [
+                            { name: '环形图', value: persent }
+                            ]
+                            
+                            chart = new F2.Chart({
+                            el: canvas,
+                            width: 140,
+                            height: 140,
+                            padding: [ 0, 20, 10, 8 ]
+                            });
+                            chart.source(data, {
+                            value: {
+                                max: 100, // 设置 Y 轴的最大值
+                                min: 0
+                            }
+                            });
+                            // 坐标系配置
+                            chart.coord('polar', {
+                            transposed: true,
+                            innerRadius: 0.8,
+                            radius: 0.85
+                            });
+                            // 坐标轴的样式配置
+                            chart.axis(false);
+                            chart.tooltip(false);
+                            chart.guide().arc({
+                            start: [0, 0],
+                            end: [1, 99.98],
+                            top: false,
+                            style: {
+                                lineWidth: 8,
+                                stroke: '#ccc'
+                            }
+                            }); // draw a cricle
+                            chart.guide().text({
+                            position: ['50%', '50%'],
+                            content: array2[i][n].type_nm+'\n'+array2[i][n].percent+'% '+array2[i][n].num+'元',
+                            style: {
+                                fontSize: 11,
+                                // fill: '#1890FF'
+                                fill: '#000'
+                            }
+                            });
+                            chart.interval().position('name*value').size(8);
+                        
+                            chart.render();
+                            return chart;
+                        };
+                        let opts = {onInit:func};
+                        optsArray[i*3+n] = opts;
+                        }
+                    }
+
+                    //更新柱状图的数据
+                    let columnData = [];
+                    for(let i=0;i<12;i++) { //取整
+                        arrayColumnar[i]=Math.round(arrayColumnar[i]);
+                        let jsonData = {};
+                        jsonData.num = arrayColumnar[i];
+                        jsonData.month = (i+1)+'月';
+                        columnData[i] = jsonData;
+                    }
+                    // 绘制柱状图上的数字
+                    columnData.map(function(obj) {
+                        if(obj.num>0) {
+                            columnChart.guide().text({
+                                position: [obj.month, obj.num],
+                                content: obj.num,
+                                style: {
+                                    textBaseline: 'bottom',
+                                    textAlign: 'center',
+                                    fontSize: 10
+                                },
+                                offsetY: -2
+                            });
+                        }
+                    });
+                    columnChart.changeData(columnData); 
+                    
+
                     var tempSum=sum.toFixed(1);
                     _this.setData({
                         yearTotal: tempSum,
                         year: yearStr,
                         yearShow: yearStr+"年",
-                        array2: array2
+                        array2: array2,
+                        optsArray: optsArray,
                     });
-                    
-                    for(var i=0;i<array2.length;i++) {
-                        for(var n=0;n<array2[i].length;n++) {
-                          array2[i][n].percent = Math.round((array2[i][n].num/sum)*100);  
-                          new wxCharts({
-                              animation: false,
-                              canvasId: 'ringCanvas-'+i+'-'+n,
-                              type: 'ring',
-                              extra: {
-                                  ringWidth: 8,
-                                  pie: {
-                                      offsetAngle: -90
-                                  }
-                              },
-                              title: {
-                                  name: array2[i][n].percent+'%\n'+array2[i][n].num+'元',
-                                  color: 'gray',
-                                  fontSize: 10
-                              },
-                              subtitle: {
-                                  name: array2[i][n].type_nm,
-                                  color: '#000000',
-                                  fontSize: 12
-                              },
-                              series: [{
-                                  name: '分类百分比',
-                                  data: array2[i][n].percent,
-                                  stroke: false
-                              }, {
-                                  name: '100%减分类百分比',
-                                  data: 100-array2[i][n].percent,
-                                  stroke: false,
-                                  color: "lightgray"
-                              }],
-                              disablePieStroke: true,
-                              width: 140,
-                              height: 140,
-                              dataLabel: false,
-                              legend: false,
-                              background: '#f5f5f5',
-                              padding: 0
-                            });
-                        }
-                    }
 
-                    //柱状图
-                    for(var i=0;i<12;i++) { //取整
-                        arrayColumnar[i]=Math.round(arrayColumnar[i]);	
-                    }
-                    var windowWidth = 320;
-                    try {
-                        var res = wx.getSystemInfoSync();
-                        windowWidth = res.windowWidth;
-                    } catch (e) {
-                        console.error('getSystemInfoSync failed!');
-                    }
-                    var columnChart = new wxCharts({
-                        canvasId: 'columnCanvas',
-                        type: 'column',
-                        animation: false,
-                        categories: monthCategories,
-                        series: [{
-                            name: '消费金额(元)',
-                            data: arrayColumnar,
-                            format: function (val, name) {
-                                return val;
-                            }
-                        }],
-                        yAxis: {
-                            disabled: true,
-                            format: function (val) {
-                                return val;
-                            },
-                            min: 0
-                        },
-                        xAxis: {
-                            disableGrid: false,
-                            type: 'calibration'
-                        },
-                        extra: {
-                            column: {
-                                width: 12
-                            }
-                        },
-                        width: windowWidth,
-                        height: 200,
-                    });
                 }
             },
             error: function(error) {

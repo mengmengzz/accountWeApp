@@ -1,3 +1,6 @@
 {
-    "navigationBarTitleText": "年度统计"
+    "navigationBarTitleText": "年度统计",
+    "usingComponents": {
+      "ff-canvas": "@antv/f2-canvas"
+    }
   }

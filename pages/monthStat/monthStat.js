@@ -1,11 +1,11 @@
 const Bmob = require('../../utils/bmob.js');
 const Util = require('../../utils/util.js');
 const Common = require('../../utils/common.js');
-const wxCharts = require('../../utils/wxcharts.js');
 
 //获取应用实例
 const app = getApp()
 const currentMonth = Util.getFormatDate().substr(0,7);
+let chart = null;
 
 Page({
   data: {
@@ -13,12 +13,12 @@ Page({
     monthShow: currentMonth.split("-")[0]+"年"+currentMonth.split("-")[1]+"月",
     endMonth: currentMonth,
     monthTotal: "",
-    array2: []
+    array2: [],
+    optsArray: []
   },
 
   bindDateChange: function(e) {
     let monthStr = e.detail.value;
-    //this.drawChart(monthStr);
     wx.redirectTo({
       url: '../monthStat/monthStat?monthStr='+monthStr
     })
@@ -32,13 +32,16 @@ Page({
 
   onLoad: function (option) {
     if(option.monthStr) {
-      this.drawChart(option.monthStr);
+      this.loadData(option.monthStr);
     }else {
-      this.drawChart(currentMonth);
+      this.loadData(currentMonth);
     }
   },
 
-  drawChart: function(monthStr) {
+  onReady: function() {
+  },
+
+  loadData: function(monthStr) {
     let _this = this;
     let year = monthStr.split("-")[0];
     let month = monthStr.split("-")[1];
@@ -66,7 +69,7 @@ Page({
     query.find({
       success: function(results) {
         //alert(results.length); 
-        for (var i = 0; i < results.length; i++) {
+        for (let i = 0; i < results.length; i++) {
             var object = results[i];
             sum=sum+parseFloat(object.get("money"));
             if(array.length==0) {
@@ -76,7 +79,7 @@ Page({
               j++;
             }else {
               var flag=false;
-              for(var m=0;m<array.length;m++) {
+              for(let m=0;m<array.length;m++) {
                 if(array[m].type_nm==object.get("type_nm")) {
                   array[m].num=array[m].num+parseFloat(object.get("money"));
                   flag=true;
@@ -104,7 +107,7 @@ Page({
             return 0;
         });
 
-        for(var n=0;n<array.length;n++) {
+        for(let n=0;n<array.length;n++) {
           array[n].num = array[n].num.toFixed(1);
           let moneyNum = array[n].num;
           if(moneyNum.indexOf(".0")!=-1) {
@@ -114,7 +117,7 @@ Page({
         }
 
       //一维数组转二维数组
-      for(var i=0;i<array.length;i++) {  
+      for(let i=0;i<array.length;i++) {  
         if(y<3) {
           if(y==0) {
             array2[x]=[];
@@ -129,58 +132,79 @@ Page({
         }
       }
       
-      //console.log(array2);
+      //console.log("异步《《《《《《",array2);
+      //设置环形图属性
+      let optsArray = [];
+      for(let i=0;i<array2.length;i++) {
+        for(let n=0;n<array2[i].length;n++) {
+          array2[i][n].percent = Math.round((array2[i][n].num/sum)*100);  
+          let func = function(canvas, width, height, F2) {
+            let persent = array2[i][n].percent;
+            if(persent==0) { //此处的百分比0表示四舍五入后为0，实际上是有值的，为了让其能在环形图上显示，将其百分比设为1
+              persent = 1;
+            }
+            const data = [
+              { name: '环形图', value: persent }
+            ]
+            
+            chart = new F2.Chart({
+              el: canvas,
+              width: 140,
+              height: 140,
+              padding: [ 0, 20, 10, 8 ]
+            });
+            chart.source(data, {
+              value: {
+                max: 100, // 设置 Y 轴的最大值
+                min: 0
+              }
+            });
+            // 坐标系配置
+            chart.coord('polar', {
+              transposed: true,
+              innerRadius: 0.8,
+              radius: 0.85
+            });
+            // 坐标轴的样式配置
+            chart.axis(false);
+            chart.tooltip(false);
+            chart.guide().arc({
+              start: [0, 0],
+              end: [1, 99.98],
+              top: false,
+              style: {
+                lineWidth: 8,
+                stroke: '#ccc'
+              }
+            }); // draw a cricle
+            chart.guide().text({
+              position: ['50%', '50%'],
+              content: array2[i][n].type_nm+'\n'+array2[i][n].percent+'% '+array2[i][n].num+'元',
+              style: {
+                fontSize: 11,
+                // fill: '#1890FF'
+                fill: '#000'
+              }
+            });
+            chart.interval().position('name*value').size(8);
+          
+            chart.render();
+            return chart;
+          };
+          let opts = {onInit:func};
+          optsArray[i*3+n] = opts;
+        }
+      }
+
       var tempSum=sum.toFixed(1);
       _this.setData({
         monthTotal: tempSum,
         month: monthStr,
         monthShow: monthStr.split("-")[0]+"年"+monthStr.split("-")[1]+"月",
-        array2: array2
-      });  
-
-      for(var i=0;i<array2.length;i++) {
-        for(var n=0;n<array2[i].length;n++) {
-          array2[i][n].percent = Math.round((array2[i][n].num/sum)*100);  
-          new wxCharts({
-              animation: false,
-              canvasId: 'ringCanvas-'+i+'-'+n,
-              type: 'ring',
-              extra: {
-                  ringWidth: 8,
-                  pie: {
-                      offsetAngle: -90
-                  }
-              },
-              title: {
-                  name: array2[i][n].percent+'%\n'+array2[i][n].num+'元',
-                  color: 'gray',
-                  fontSize: 10
-              },
-              subtitle: {
-                  name: array2[i][n].type_nm,
-                  color: '#000000',
-                  fontSize: 12
-              },
-              series: [{
-                  name: '分类百分比',
-                  data: array2[i][n].percent,
-                  stroke: false
-              }, {
-                  name: '100%减分类百分比',
-                  data: 100-array2[i][n].percent,
-                  stroke: false,
-                  color: "lightgray"
-              }],
-              disablePieStroke: true,
-              width: 140,
-              height: 140,
-              dataLabel: false,
-              legend: false,
-              background: '#f5f5f5',
-              padding: 0
-            });
-        }
-      }
+        array2: array2,
+        optsArray: optsArray
+      },function() {
+      });
 
       },
       error: function(error) {

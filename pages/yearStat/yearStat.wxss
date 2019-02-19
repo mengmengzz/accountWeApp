@@ -12,11 +12,14 @@
     display: flex;
     flex-direction: row;
 }
-.canvas {
-    width: 120px;
-    height: 120px;
+.container2 {
+    display: flex;
+    flex-direction: column;
 }
-
+ff-canvas {
+    width: 33%;
+    height: 250rpx;
+}
 .page__bd {
     padding-top: 5px;
 }
@@ -28,6 +31,6 @@
 }
 
 .canvasColumn {
-    width: 400px;
-    height: 200px;
+    width: 100%;
+    height: 400rpx;
 }
